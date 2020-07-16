@@ -33,8 +33,8 @@ The individual leve transaction records look like the following:
 '''
 
 # Load Data:
-cust_trans = pd.read_csv(r'C:\Users\Matt\Desktop\Streamlit\cust_trans.csv')
-CBS = pd.read_csv(r'C:\Users\Matt\Desktop\Streamlit\CBS.csv')
+cust_trans = pd.read_csv(r'cust_trans.csv')
+CBS = pd.read_csv(r'CBS.csv')
 
 # Show/Hide Data:
 show_hide = st.selectbox('Show/Hide Transaction Data',('Show Data Example', 'Show Number of Transaction Records'))
