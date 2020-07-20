@@ -83,7 +83,8 @@ def binned_max_freq(df,max_x):
     return df.loc[0:max_x].append({'freq':str(max_x) + '+','count':df[df.iloc[:,0] >= max_x].iloc[:,1].sum()},ignore_index = True)
 
 # Visualize Model Fit:
-fit_viz = st.selectbox('Select Visualization', ('Simulation on Training Data', 'Simulation on Testing Data'))
+st.write('Select Model Fit Visualization from Dropdown List')
+fit_viz = st.selectbox('Visualization Type', ('Simulation on Training Data', 'Simulation on Testing Data'))
 def create_fit_viz(fit_viz):
     if fit_viz == 'Simulation on Training Data':
         '''
@@ -127,6 +128,26 @@ def create_fit_viz(fit_viz):
 
 
 viz = create_fit_viz(fit_viz)
+
+# Generate List of Customers Likely to Dropout:
+st.title('Find Customers Likely to Dropout')
+'''
+Using the model, we can find the customers who are likely to drop out at the end of training period. 
+This can help the business identify potential customer loses and take action to retain these customers.
+Enter the drop out proabilities below to find the potential customer loses.
+'''
+min = st.slider('Min. Alive Proability', min_value = 0.0, max_value = 1.0, step = 0.05)
+max = st.slider('Max. Alive Proability', min_value = 0.0, max_value = 1.0, step = 0.05)
+def prob_alive(min, max):
+    df = CBS[['CustID', 'frequency_cal','recency_cal', 'T_cal']]
+    if min < max:
+        df['p_alive'] = bgnbd_model.conditional_probability_alive(df['frequency_cal'], df['recency_cal'], df['T_cal'])
+        cust_list = df[(df['p_alive'] >= min)&(df['p_alive'] <= max)]['CustID']
+        return st.write(cust_list)
+    else:
+        return st.write('Selection invalid. Minimum alive probability must be smaller than maximum alive probability.')
+
+prob_alive(min, max)
 
 # Plot individual custoemr dropout probability at the end of calibration:
 # cust_id = st.text_input('Input Customer ID')
@@ -177,23 +198,3 @@ try:
     individual_plot(indi_viz_type)
 except ValueError:
     pass
-
-# Generate List of Customers Likely to Dropout:
-st.title('Find Customers Likely to Dropout')
-'''
-Using the model, we can find the customers who are likely to drop out at the end of training period. 
-This can help the business identify potential customer loses and take action to retain these customers.
-Enter the drop out proabilities below to find the potential customer loses.
-'''
-min = st.slider('Min.Dropout Proability', min_value = 0.0, max_value = 1.0, step = 0.05)
-max = st.slider('Max. Dropout Proability', min_value = 0.0, max_value = 1.0, step = 0.05)
-def prob_alive(min, max):
-    df = CBS[['CustID', 'frequency_cal','recency_cal', 'T_cal']]
-    if min < max:
-        df['p_alive'] = bgnbd_model.conditional_probability_alive(df['frequency_cal'], df['recency_cal'], df['T_cal'])
-        cust_list = df[(df['p_alive'] >= min)&(df['p_alive'] <= max)]['CustID']
-        return st.write(cust_list)
-    else:
-        return st.write('Selection invalid. Minimum dropout probability must be smaller than maximum dropout probability.')
-
-prob_alive(min, max)
