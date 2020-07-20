@@ -1,1 +1,1 @@
-web: sh setup.sh && streamlit run demo1.py
+web: sh setup.sh && streamlit run transaction_prediciton.py
